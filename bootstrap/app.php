@@ -11,7 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // In the test environment, bypass CSRF to simplify HTTP feature tests
+        if (app()->environment('testing')) {
+            $middleware->validateCsrfTokens(except: ['*']);
+        }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
