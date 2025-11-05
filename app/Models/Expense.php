@@ -7,23 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Payment extends Model
+class Expense extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'payments';
+    protected $table = 'expenses';
 
     protected $fillable = [
         'collection_id',
-        'guardian_id',
         'amount',
-        'payment_date',
+        'expense_date',
         'description',
+        'approved',
     ];
 
     protected $casts = [
-        'payment_date' => 'date',
+        'expense_date' => 'date',
     ];
 
     /**
@@ -32,13 +32,5 @@ class Payment extends Model
     public function collection(): BelongsTo
     {
         return $this->belongsTo(Collection::class, 'collection_id');
-    }
-
-    /**
-     * @return BelongsTo
-     */
-    public function guardian(): BelongsTo
-    {
-        return $this->belongsTo(Guardian::class, 'guardian_id');
     }
 }
