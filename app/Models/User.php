@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -58,6 +59,22 @@ class User extends Authenticatable
     public function collections(): HasMany
     {
         return $this->hasMany(Collection::class, 'user_id');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCollector(): bool
+    {
+        return $this->role === 'collector';
     }
 
     /**
