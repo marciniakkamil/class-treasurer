@@ -20,7 +20,7 @@ class Collection extends Model
         'school_year',
         'description',
         'status',
-        'active',
+        'is_active',
     ];
 
     /**

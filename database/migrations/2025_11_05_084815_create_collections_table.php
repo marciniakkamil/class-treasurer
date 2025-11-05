@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('school_year')->default('2025')->nullable();
             $table->string('description')->nullable();
             $table->string('status')->default('pending')->nullable();
-            $table->boolean('active')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->softDeletes();
             $table->timestamps();
         });
