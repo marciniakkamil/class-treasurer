@@ -25,7 +25,6 @@ class Guardian extends Model
 
     /**
      * Get the collection that owns the Guardian
-     * @return BelongsTo
      */
     public function collection(): BelongsTo
     {
@@ -34,11 +33,9 @@ class Guardian extends Model
 
     /**
      * Get all the payments for the Guardian
-     * @return HasMany
      */
     public function payments(): HasMany
     {
-        return $this->hasMany(Payment::class, 'parent_id');
+        return $this->hasMany(Payment::class, 'guardian_id');
     }
-
 }
