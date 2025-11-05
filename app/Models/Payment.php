@@ -27,6 +27,7 @@ class Payment extends Model
     ];
 
     /**
+     * Get the collection that owns the Payment
      * @return BelongsTo
      */
     public function collection(): BelongsTo
@@ -35,6 +36,7 @@ class Payment extends Model
     }
 
     /**
+     * Get the guardian that owns the Payment
      * @return BelongsTo
      */
     public function guardian(): BelongsTo

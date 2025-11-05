@@ -27,6 +27,7 @@ class Expense extends Model
     ];
 
     /**
+     * Get the collection that owns the Expense
      * @return BelongsTo
      */
     public function collection(): BelongsTo

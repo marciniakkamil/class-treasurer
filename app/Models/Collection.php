@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Collection extends Model
@@ -32,19 +33,31 @@ class Collection extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-//    public function parents()
-//    {
-//        return $this->hasMany(ParentModel::class);
-//    }
-//
-//    public function payments()
-//    {
-//        return $this->hasMany(Payment::class);
-//    }
-//
-//    public function expenses()
-//    {
-//        return $this->hasMany(Expense::class);
-//    }
+    /**
+     * Get all the guardians for the Collection
+     * @return HasMany
+     */
+    public function guardians(): HasMany
+    {
+        return $this->hasMany(Guardian::class, 'collection_id');
+    }
+
+    /**
+     * Get all the payments for the Collection
+     * @return HasMany
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'collection_id');
+    }
+
+    /**
+     * Get all the expenses for the Collection
+     * @return HasMany
+     */
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class, 'collection_id');
+    }
 
 }
