@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -25,8 +26,23 @@ class Collection extends Model
     ];
 
     /**
+     * Scope: limit collections visible to a given user.
+     */
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        if ($user->isAdmin()) {
+            return $query;
+        }
+
+        if ($user->isCollector()) {
+            return $query->where('user_id', $user->id);
+        }
+
+        return $query->whereRaw('1 = 0');
+    }
+
+    /**
      * Get the user that owns the Collection
-     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
@@ -35,7 +51,6 @@ class Collection extends Model
 
     /**
      * Get all the guardians for the Collection
-     * @return HasMany
      */
     public function guardians(): HasMany
     {
@@ -44,7 +59,6 @@ class Collection extends Model
 
     /**
      * Get all the payments for the Collection
-     * @return HasMany
      */
     public function payments(): HasMany
     {
@@ -53,11 +67,9 @@ class Collection extends Model
 
     /**
      * Get all the expenses for the Collection
-     * @return HasMany
      */
     public function expenses(): HasMany
     {
         return $this->hasMany(Expense::class, 'collection_id');
     }
-
 }
