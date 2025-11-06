@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Collections\ListCollections;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -29,4 +30,7 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
+
+    Route::get('/collections', ListCollections::class)
+        ->name('collections.index');
 });
