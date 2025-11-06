@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Collections\ListCollections;
+use App\Models\Collection;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -9,7 +10,17 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', function () {
+    /** @var \App\Models\User $user */
+    $user = auth()->user();
+
+    $activeCollectionsCount = Collection::query()
+        ->visibleTo($user)
+        ->where('is_active', true)
+        ->count();
+
+    return view('dashboard', compact('activeCollectionsCount'));
+})
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 

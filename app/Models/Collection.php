@@ -2,13 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Builders\CollectionBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @method static CollectionBuilder query()
+ * @method CollectionBuilder newQuery()
+ * @method CollectionBuilder newModelQuery()
+ * @mixin CollectionBuilder
+ */
 class Collection extends Model
 {
     use HasFactory;
@@ -26,19 +32,19 @@ class Collection extends Model
     ];
 
     /**
+     * Use custom Eloquent Builder.
+     */
+    public function newEloquentBuilder($query): CollectionBuilder
+    {
+        return new CollectionBuilder($query);
+    }
+
+    /**
      * Scope: limit collections visible to a given user.
      */
-    public function scopeVisibleTo(Builder $query, User $user): Builder
+    public function scopeVisibleTo(CollectionBuilder $query, User $user): CollectionBuilder
     {
-        if ($user->isAdmin()) {
-            return $query;
-        }
-
-        if ($user->isCollector()) {
-            return $query->where('user_id', $user->id);
-        }
-
-        return $query->whereRaw('1 = 0');
+        return $query->visibleTo($user);
     }
 
     /**
