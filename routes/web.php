@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Collections\DeleteCollectionController;
 use App\Livewire\Collections\CreateCollection;
 use App\Livewire\Collections\ListCollections;
 use App\Livewire\Collections\ShowCollection;
@@ -41,4 +42,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/collections/{collection}', ShowCollection::class)
         ->name('collections.show');
+
+    Route::delete('/collections/{collection}', DeleteCollectionController::class)
+        ->name('collections.delete');
 });

@@ -28,6 +28,15 @@ class ListCollections extends Component
 
     public array $schoolYearOptions = [];
 
+    /**
+     * Sterowanie modalem potwierdzenia usunięcia.
+     */
+    public bool $showDeleteModal = false;
+
+    public ?int $pendingDeleteId = null;
+
+    public string $pendingDeleteName = '';
+
     protected $queryString = [
         'filters' => [
             'except' => [
@@ -55,6 +64,20 @@ class ListCollections extends Component
     public function updatedFilters(): void
     {
         $this->resetPage();
+    }
+
+    public function confirmDelete(int $collectionId, string $collectionName): void
+    {
+        $this->pendingDeleteId = $collectionId;
+        $this->pendingDeleteName = $collectionName;
+        $this->showDeleteModal = true;
+    }
+
+    public function cancelDelete(): void
+    {
+        $this->showDeleteModal = false;
+        $this->pendingDeleteId = null;
+        $this->pendingDeleteName = '';
     }
 
     public function clearFilters(): void

@@ -64,11 +64,21 @@
                         <td class="p-2 text-center">
                             {{ ($collection->payments_sum_amount ?? 0) - ($collection->expenses_sum_amount ?? 0) }} zł
                         </td>
-                        <td class="p-2 text-center">
-                            <a href="{{ route('collections.show', $collection) }}"
-                               class="text-blue-600  hover:underline font-medium rounded-md">
-                                Szczegóły
-                            </a>
+                        <td class="p-2">
+                            <div class="flex items-center justify-center gap-3">
+                                @can('delete', $collection)
+                                    <button type="button" class="inline-flex items-center cursor-pointer" title="Usuń"
+                                            wire:click="confirmDelete({{ $collection->id }}, @js($collection->name))">
+                                        <flux:icon name="trash" class="size-5 text-red-600" />
+                                        <span class="sr-only">Usuń</span>
+                                    </button>
+                                @endcan
+
+                                <a href="{{ route('collections.show', $collection) }}"
+                                   class="text-blue-600 hover:underline font-medium rounded-md inline-flex items-center gap-1">
+                                    <span>Szczegóły</span>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 @endforeach
@@ -91,4 +101,17 @@
             </a>
         @endcan
     </div>
+
+    <x-confirm-modal
+        name="confirm-collection-deletion"
+        wire:model="showDeleteModal"
+        :title="'Potwierdź usunięcie'"
+        :description="'Czy na pewno chcesz usunąć zbiórkę: <strong>' . e($pendingDeleteName) . '</strong>? Tej operacji nie można cofnąć.'"
+        :confirm-url="$pendingDeleteId ? route('collections.delete', $pendingDeleteId) : null"
+        confirm-http="DELETE"
+        confirm-label="Usuń"
+        cancel-label="Anuluj"
+        variant="danger"
+        cancel-method="cancelDelete"
+    />
 </div>
