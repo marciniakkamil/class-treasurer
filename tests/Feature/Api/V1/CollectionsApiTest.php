@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\UserRole;
 use App\Models\Collection;
 use App\Models\User;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
@@ -77,14 +78,14 @@ it('updates collection when owner (200) and forbids non-owner (403)', function (
     $collection = Collection::factory()->for($owner)->create(['name' => 'Old']);
 
     // owner can update
-    withHeaders(bearer($owner))
-        ->putJson("/api/v1/collections/{$collection->id}", ['name' => 'New'])
+    Sanctum::actingAs($owner);
+    putJson("/api/v1/collections/{$collection->id}", ['name' => 'New'])
         ->assertOk()
         ->assertJsonPath('data.name', 'New');
 
     // other cannot
-    withHeaders(bearer($other))
-        ->putJson("/api/v1/collections/{$collection->id}", ['name' => 'Hack'])
+    Sanctum::actingAs($other);
+    putJson("/api/v1/collections/{$collection->id}", ['name' => 'Hack'])
         ->assertForbidden();
 });
 
@@ -94,13 +95,13 @@ it('deletes collection when owner or admin', function () {
     $c1 = Collection::factory()->for($owner)->create();
     $c2 = Collection::factory()->create();
 
-    withHeaders(bearer($owner))
-        ->deleteJson("/api/v1/collections/{$c1->id}")
+    Sanctum::actingAs($owner);
+    deleteJson("/api/v1/collections/{$c1->id}")
         ->assertNoContent();
     expect(Collection::withTrashed()->find($c1->id)->trashed())->toBeTrue();
 
-    withHeaders(bearer($admin))
-        ->deleteJson("/api/v1/collections/{$c2->id}")
+    Sanctum::actingAs($admin);
+    deleteJson("/api/v1/collections/{$c2->id}")
         ->assertNoContent();
     expect(Collection::withTrashed()->find($c2->id)->trashed())->toBeTrue();
 });
