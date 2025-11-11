@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\Collection;
 use App\Models\Expense;
 use App\Models\Guardian;
@@ -23,7 +24,7 @@ class DemoDataSeeder extends Seeder
             [
                 'name' => 'Skarbnik Klasowy',
                 'password' => 'password',
-                'role' => 'collector',
+                'role' => UserRole::COLLECTOR->value,
             ]
         );
 
@@ -33,7 +34,7 @@ class DemoDataSeeder extends Seeder
             [
                 'name' => 'Administrator',
                 'password' => 'password',
-                'role' => 'admin',
+                'role' => UserRole::ADMIN->value,
             ]
         );
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Models\Collection;
 use App\Models\Expense;
 use App\Models\Guardian;
@@ -17,9 +18,9 @@ it('seeds demo data graph: one treasurer, multiple collections, guardians, payme
     $admin = User::where('email', 'admin@example.com')->first();
 
     expect($treasurer)->not->toBeNull()
-        ->and($treasurer->role)->toEqual('collector')
+        ->and($treasurer->role)->toBe(UserRole::COLLECTOR)
         ->and($admin)->not->toBeNull()
-        ->and($admin->role)->toEqual('admin');
+        ->and($admin->role)->toBe(UserRole::ADMIN);
 
     // Collections (fixed 3 in seeder) for treasurer
     $collections = Collection::where('user_id', $treasurer->id)->get();
