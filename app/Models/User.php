@@ -10,11 +10,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -56,24 +57,17 @@ class User extends Authenticatable
 
     /**
      * Get the user's collections
-     * @return HasMany
      */
     public function collections(): HasMany
     {
         return $this->hasMany(Collection::class, 'user_id');
     }
 
-    /**
-     * @return bool
-     */
     public function isAdmin(): bool
     {
         return $this->role === UserRole::ADMIN;
     }
 
-    /**
-     * @return bool
-     */
     public function isCollector(): bool
     {
         return $this->role === UserRole::COLLECTOR;

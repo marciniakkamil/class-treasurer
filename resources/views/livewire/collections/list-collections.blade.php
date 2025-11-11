@@ -1,7 +1,7 @@
 <div class="p-6 bg-white shadow-md rounded-2xl">
     <h1 class="text-2xl font-semibold mb-4">Zbiórki</h1>
 
-    <!-- Filtry -->
+    <!-- Filtry todo przerobic na komponent -->
     <div class="mb-4 grid gap-3 md:grid-cols-4">
         <div>
             <flux:field label="Nazwa">
