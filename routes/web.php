@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Collections\CreateCollection;
 use App\Livewire\Collections\ListCollections;
 use App\Livewire\Collections\ShowCollection;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/collections', ListCollections::class)
         ->name('collections.index');
+
+    Route::get('/collections/create', CreateCollection::class)
+        ->name('collections.create');
 
     Route::get('/collections/{collection}', ShowCollection::class)
         ->name('collections.show');

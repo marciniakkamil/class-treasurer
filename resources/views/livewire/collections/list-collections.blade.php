@@ -66,7 +66,7 @@
                         </td>
                         <td class="p-2 text-center">
                             <a href="{{ route('collections.show', $collection) }}"
-                               class="text-blue-600 hover:underline font-medium">
+                               class="text-blue-600  hover:underline font-medium rounded-md">
                                 Szczegóły
                             </a>
                         </td>
@@ -84,10 +84,11 @@
 
     <div class="mt-4">
         @can('create', App\Models\Collection::class)
-{{--            <a href="{{ route('collections.create') }}"--}}
-{{--               class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">--}}
-{{--                ➕ Nowa zbiórka--}}
-{{--            </a>--}}
+            <a href="{{ route('collections.create') }}"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <flux:icon name="plus" class="size-5" />
+                <span>Nowa zbiórka</span>
+            </a>
         @endcan
     </div>
 </div>
