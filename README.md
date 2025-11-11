@@ -31,6 +31,10 @@ If you don’t see changes in the browser UI:
 - Make sure the `class-treasurer-node` container is running (it runs Vite HMR).
 - Hard refresh the page to clear cache.
 
+4. Visit the app in your browser: http://localhost:8000
+5. If you want to run the demo data seeder: `php artisan db:seed --class=DemoDataSeeder`
+6. Admin login credentials after running demoDataSeeder: `email: admin@example.com` `password: password`
+
 ## Useful commands
 
 - Open a shell in the app (PHP) container:

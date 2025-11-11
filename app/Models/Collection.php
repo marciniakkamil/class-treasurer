@@ -2,12 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Builders\CollectionBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @method static CollectionBuilder query()
+ * @method CollectionBuilder newQuery()
+ * @method CollectionBuilder newModelQuery()
+ * @mixin CollectionBuilder
+ */
 class Collection extends Model
 {
     use HasFactory;
@@ -25,8 +32,23 @@ class Collection extends Model
     ];
 
     /**
+     * Use custom Eloquent Builder.
+     */
+    public function newEloquentBuilder($query): CollectionBuilder
+    {
+        return new CollectionBuilder($query);
+    }
+
+    /**
+     * Scope: limit collections visible to a given user.
+     */
+    public function scopeVisibleTo(CollectionBuilder $query, User $user): CollectionBuilder
+    {
+        return $query->visibleTo($user);
+    }
+
+    /**
      * Get the user that owns the Collection
-     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
@@ -35,7 +57,6 @@ class Collection extends Model
 
     /**
      * Get all the guardians for the Collection
-     * @return HasMany
      */
     public function guardians(): HasMany
     {
@@ -44,7 +65,6 @@ class Collection extends Model
 
     /**
      * Get all the payments for the Collection
-     * @return HasMany
      */
     public function payments(): HasMany
     {
@@ -53,11 +73,9 @@ class Collection extends Model
 
     /**
      * Get all the expenses for the Collection
-     * @return HasMany
      */
     public function expenses(): HasMany
     {
         return $this->hasMany(Expense::class, 'collection_id');
     }
-
 }

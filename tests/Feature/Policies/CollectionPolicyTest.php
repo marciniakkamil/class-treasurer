@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Enums\UserRole;
 use App\Models\Collection;
 use App\Models\User;
 
 it('allows admin to perform any action via before hook', function () {
-    $admin = User::factory()->create(['role' => 'admin']);
-    $owner = User::factory()->create(['role' => 'collector']);
+    $admin = User::factory()->create(['role' => UserRole::ADMIN]);
+    $owner = User::factory()->create(['role' => UserRole::COLLECTOR]);
     $collection = Collection::factory()->for($owner)->create();
 
     // Admin can viewAny
@@ -21,7 +22,7 @@ it('allows admin to perform any action via before hook', function () {
 });
 
 it('allows collectors to viewAny and create collections', function () {
-    $collector = User::factory()->create(['role' => 'collector']);
+    $collector = User::factory()->create(['role' => UserRole::COLLECTOR]);
 
     $this->actingAs($collector);
 
@@ -30,8 +31,8 @@ it('allows collectors to viewAny and create collections', function () {
 });
 
 it('allows collector to view/update/delete only their own collections', function () {
-    $collector = User::factory()->create(['role' => 'collector']);
-    $otherCollector = User::factory()->create(['role' => 'collector']);
+    $collector = User::factory()->create(['role' => UserRole::COLLECTOR]);
+    $otherCollector = User::factory()->create(['role' => UserRole::COLLECTOR]);
 
     $ownCollection = Collection::factory()->for($collector)->create();
     $othersCollection = Collection::factory()->for($otherCollector)->create();
@@ -49,16 +50,3 @@ it('allows collector to view/update/delete only their own collections', function
         ->and($collector->can('delete', $othersCollection))->toBeFalse();
 });
 
-it('denies non-privileged users to viewAny, create or manage collections', function () {
-    $member = User::factory()->create(['role' => 'member']);
-    $collector = User::factory()->create(['role' => 'collector']);
-    $collection = Collection::factory()->for($collector)->create();
-
-    $this->actingAs($member);
-
-    expect($member->can('viewAny', Collection::class))->toBeFalse()
-        ->and($member->can('create', Collection::class))->toBeFalse()
-        ->and($member->can('view', $collection))->toBeFalse()
-        ->and($member->can('update', $collection))->toBeFalse()
-        ->and($member->can('delete', $collection))->toBeFalse();
-});

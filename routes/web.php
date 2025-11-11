@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Collections\DeleteCollectionController;
+use App\Livewire\Collections\CreateCollection;
+use App\Livewire\Collections\ListCollections;
+use App\Livewire\Collections\ShowCollection;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -29,4 +33,16 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
+
+    Route::get('/collections', ListCollections::class)
+        ->name('collections.index');
+
+    Route::get('/collections/create', CreateCollection::class)
+        ->name('collections.create');
+
+    Route::get('/collections/{collection}', ShowCollection::class)
+        ->name('collections.show');
+
+    Route::delete('/collections/{collection}', DeleteCollectionController::class)
+        ->name('collections.delete');
 });
