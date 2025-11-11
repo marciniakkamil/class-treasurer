@@ -18,7 +18,7 @@ it('filters by name in ListCollections', function () {
     $this->actingAs($collector);
 
     Livewire::test(ListCollections::class)
-        ->set('name', 'Alpha')
+        ->set('filters.name', 'Alpha')
         ->assertSee('Alpha Trip')
         ->assertDontSee('Beta Books');
 });
@@ -32,7 +32,7 @@ it('filters by school_year in ListCollections', function () {
     $this->actingAs($collector);
 
     Livewire::test(ListCollections::class)
-        ->set('school_year', '2023/2024')
+        ->set('filters.school_year', '2023/2024')
         ->assertSee('Old Year')
         ->assertDontSee('Current Year');
 });
@@ -46,7 +46,7 @@ it('filters by is_active in ListCollections and can clear filters', function () 
     $this->actingAs($collector);
 
     Livewire::test(ListCollections::class)
-        ->set('is_active', '1')
+        ->set('filters.is_active', '1')
         ->assertSee('Active One')
         ->assertDontSee('Inactive One')
         ->call('clearFilters')

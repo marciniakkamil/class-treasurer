@@ -6,14 +6,14 @@
         <div>
             <flux:field label="Nazwa">
                 <flux:input
-                    wire:model.live.debounce.300ms="name"
+                    wire:model.live.debounce.300ms="filters.name"
                     placeholder="Szukaj po nazwie..."
                 />
             </flux:field>
         </div>
         <div>
             <flux:field label="Rok szkolny">
-                <flux:select wire:model.live="school_year">
+                <flux:select wire:model.live="filters.school_year">
                     <option value="">Wszystkie</option>
                     @foreach($this->schoolYearOptions as $year)
                         <option value="{{ $year }}">{{ $year }}</option>
@@ -23,7 +23,7 @@
         </div>
         <div>
             <flux:field label="Status">
-                <flux:select wire:model.live="is_active">
+                <flux:select wire:model.live="filters.is_active">
                     <option value="">Wszystkie</option>
                     <option value="1">Aktywne</option>
                     <option value="0">Nieaktywne</option>
@@ -65,10 +65,10 @@
                             {{ ($collection->payments_sum_amount ?? 0) - ($collection->expenses_sum_amount ?? 0) }} zł
                         </td>
                         <td class="p-2 text-center">
-{{--                            <a href="{{ route('collections.show', $collection) }}"--}}
-{{--                               class="text-blue-600 hover:underline font-medium">--}}
-{{--                                Szczegóły--}}
-{{--                            </a>--}}
+                            <a href="{{ route('collections.show', $collection) }}"
+                               class="text-blue-600 hover:underline font-medium">
+                                Szczegóły
+                            </a>
                         </td>
                     </tr>
                 @endforeach

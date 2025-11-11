@@ -4,60 +4,79 @@ namespace App\Livewire\Collections;
 
 use App\Filters\CollectionFilters;
 use App\Models\Collection;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Contracts\View\View;
 
 class ListCollections extends Component
 {
     use AuthorizesRequests;
     use WithPagination;
 
-    public string $name = '';
-
-    public string $school_year = '';
-
-    public string $is_active = '';
+    /**
+     * Zbiorcze filtry przekazywane również w query string jako filters[...].
+     *
+     * @var array{name: string, school_year: string, is_active: string}
+     */
+    public array $filters = [
+        'name' => '',
+        'school_year' => '',
+        'is_active' => '',
+    ];
 
     public array $schoolYearOptions = [];
 
     protected $queryString = [
-        'name' => ['except' => ''],
-        'school_year' => ['except' => ''],
-        'is_active' => ['except' => ''],
+        'filters' => [
+            'except' => [
+                'name' => '',
+                'school_year' => '',
+                'is_active' => '',
+            ],
+        ],
     ];
 
-    public function updatedName(): void
+    public function mount(): void
     {
-        $this->resetPage();
+        // Kompatybilność ze starszymi URL: ?name=&school_year=&is_active=
+        $legacy = array_filter([
+            'name' => request()->query('name'),
+            'school_year' => request()->query('school_year'),
+            'is_active' => request()->query('is_active'),
+        ], static fn ($v) => $v !== null);
+
+        if ($legacy !== []) {
+            $this->filters = array_merge($this->filters, $legacy);
+        }
     }
 
-    public function updatedSchoolYear(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatedIsActive(): void
+    public function updatedFilters(): void
     {
         $this->resetPage();
     }
 
     public function clearFilters(): void
     {
-        $this->name = '';
-        $this->school_year = '';
-        $this->is_active = '';
+        $this->filters = [
+            'name' => '',
+            'school_year' => '',
+            'is_active' => '',
+        ];
         $this->resetPage();
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function render(): View
     {
         $this->authorize('viewAny', Collection::class);
         /* @var \App\Models\User $user */
         $user = auth()->user();
 
-        $this->schoolYearOptions = Collection::query()
+        $this->schoolYearOptions = Collection::query() // todo move queries to Service or Repository
             ->visibleTo($user)
             ->select('school_year')
             ->whereNotNull('school_year')
@@ -68,15 +87,9 @@ class ListCollections extends Component
             ->values()
             ->all();
 
-        $filters = CollectionFilters::fromArray([
-            'name' => $this->name,
-            'school_year' => $this->school_year,
-            'is_active' => $this->is_active,
-        ]);
-
         $collections = Collection::query()
             ->visibleTo($user)
-            ->applyFilters($filters)
+            ->applyFilters(CollectionFilters::fromArray($this->filters))
             ->withDashboardAggregates()
             ->orderByDesc('created_at')
             ->paginate(15);
