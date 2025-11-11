@@ -69,7 +69,7 @@
                                 @can('delete', $collection)
                                     <button type="button" class="inline-flex items-center cursor-pointer" title="Usuń"
                                             wire:click="confirmDelete({{ $collection->id }}, @js($collection->name))">
-                                        <flux:icon name="trash" class="size-5 text-red-600" />
+                                        <flux:icon name="trash" class="size-5 text-blue-600" />
                                         <span class="sr-only">Usuń</span>
                                     </button>
                                 @endcan
