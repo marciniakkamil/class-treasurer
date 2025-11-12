@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
 
 class CollectionController extends BaseController
 {
@@ -82,14 +83,18 @@ class CollectionController extends BaseController
         $user = $request->user();
         $data = $request->validated();
 
-        $collection = Collection::query()->create([
-            'user_id' => $user->id,
-            'name' => $data['name'],
-            'school_year' => $data['school_year'] ?? null,
-            'description' => $data['description'] ?? null,
-            'status' => $data['status'] ?? 'active',
-            'is_active' => (bool) ($data['is_active'] ?? false),
-        ]);
+        $collection = null;
+
+        DB::transaction(function () use ($user, $data) {
+            $collection = Collection::query()->create([
+                'user_id' => $user->id,
+                'name' => $data['name'],
+                'school_year' => $data['school_year'] ?? null,
+                'description' => $data['description'] ?? null,
+                'status' => $data['status'] ?? 'active',
+                'is_active' => (bool)($data['is_active'] ?? false),
+            ]);
+        });
 
         return (new CollectionResource($collection))
             ->response()
@@ -106,8 +111,11 @@ class CollectionController extends BaseController
             abort(403);
         }
         $data = $request->validated();
-        $collection->fill($data);
-        $collection->save();
+
+        DB::transaction(function () use ($data, $collection) {
+            $collection->fill($data);
+            $collection->save();
+        });
 
         return new CollectionResource($collection);
     }
@@ -121,7 +129,10 @@ class CollectionController extends BaseController
         if (! $user->isAdmin() && $user->id !== $collection->user_id) {
             abort(403);
         }
-        $collection->delete();
+
+        DB::transaction(function () use ($collection) {
+            $collection->delete();
+        });
 
         return response()->json(null, 204);
     }
