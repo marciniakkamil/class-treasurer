@@ -11,10 +11,10 @@ use App\Http\Resources\CollectionResource;
 use App\Models\Collection;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 
 class CollectionController extends BaseController
@@ -83,16 +83,14 @@ class CollectionController extends BaseController
         $user = $request->user();
         $data = $request->validated();
 
-        $collection = null;
-
-        DB::transaction(function () use ($user, $data) {
-            $collection = Collection::query()->create([
+        $collection = DB::transaction(function () use ($user, $data) {
+            return Collection::query()->create([
                 'user_id' => $user->id,
                 'name' => $data['name'],
                 'school_year' => $data['school_year'] ?? null,
                 'description' => $data['description'] ?? null,
                 'status' => $data['status'] ?? 'active',
-                'is_active' => (bool)($data['is_active'] ?? false),
+                'is_active' => (bool) ($data['is_active'] ?? false),
             ]);
         });
 
