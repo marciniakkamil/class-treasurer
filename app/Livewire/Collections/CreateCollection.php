@@ -7,6 +7,7 @@ namespace App\Livewire\Collections;
 use App\Models\Collection;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -39,14 +40,18 @@ class CreateCollection extends Component
         /* @var \App\Models\User $user */
         $user = auth()->user();
 
-        $collection = Collection::query()->create([
-            'user_id' => $user->id,
-            'name' => $validated['name'],
-            'school_year' => $validated['school_year'] ?? null,
-            'description' => $validated['description'] ?? null,
-            'status' => 'active',
-            'is_active' => (bool) ($validated['is_active'] ?? false),
-        ]);
+        $collection = null;
+
+        DB::transaction(function () use ($user, $validated) {
+            $collection = Collection::query()->create([
+                'user_id' => $user->id,
+                'name' => $validated['name'],
+                'school_year' => $validated['school_year'] ?? null,
+                'description' => $validated['description'] ?? null,
+                'status' => 'active',
+                'is_active' => (bool)($validated['is_active'] ?? false),
+            ]);
+        });
 
         session()->flash('success', 'Zbiórka została utworzona.');
 
