@@ -9,8 +9,8 @@ use App\Http\Requests\Api\V1\StoreCollectionRequest;
 use App\Http\Requests\Api\V1\UpdateCollectionRequest;
 use App\Http\Resources\CollectionResource;
 use App\Models\Collection;
+use App\Services\CollectionReadService;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,31 +28,20 @@ class CollectionController extends BaseController
      *
      * @throws AuthorizationException
      */
-    public function index(Request $request)
+    public function index(Request $request, CollectionReadService $readService)
     {
         /* @var \App\Models\User $user */
         $user = $request->user();
 
-        $query = Collection::query()
-            ->visibleTo($user)
-            ->applyFilters(CollectionFilters::fromArray((array) $request->query('filters', [])));
-
-        // Optional aggregates
+        $filters = CollectionFilters::fromArray((array) $request->query('filters', []));
         $include = collect((array) $request->query('include'));
-        if ($include->contains('aggregates')) {
-            $query->withDashboardAggregates();
-        }
-
-        // Sorting: comma-separated fields, prefix '-' for desc
-        $sortParam = (string) $request->query('sort', '-created_at');
-        $this->applySorting($query, $sortParam);
-
-        // Pagination
+        $withAggregates = $include->contains('aggregates');
+        $sort = (string) $request->query('sort', '-created_at');
         $perPage = (int) $request->query('per_page', 15);
-        $perPage = max(1, min($perPage, 100));
 
-        /** @var LengthAwarePaginator $paginator */
-        $paginator = $query->paginate($perPage)->appends($request->query());
+        $paginator = $readService
+            ->paginateForApi($user, $filters, $sort, $perPage, $withAggregates)
+            ->appends($request->query());
 
         return CollectionResource::collection($paginator);
     }
@@ -133,38 +122,5 @@ class CollectionController extends BaseController
         });
 
         return response()->json(null, 204);
-    }
-
-    /**
-     * Apply safe sorting rules.
-     */
-    private function applySorting(\App\Models\Builders\CollectionBuilder $query, string $sortParam): void
-    {
-        $fields = array_filter(array_map('trim', explode(',', $sortParam)));
-        $allowed = [
-            'created_at' => 'created_at',
-            'name' => 'name',
-            'school_year' => 'school_year',
-        ];
-
-        if ($fields === []) {
-            $query->orderByDesc('created_at');
-
-            return;
-        }
-
-        foreach ($fields as $field) {
-            $direction = 'asc';
-            if (str_starts_with($field, '-')) {
-                $direction = 'desc';
-                $field = substr($field, 1);
-            }
-
-            if (! array_key_exists($field, $allowed)) {
-                continue;
-            }
-
-            $query->orderBy($allowed[$field], $direction);
-        }
     }
 }
