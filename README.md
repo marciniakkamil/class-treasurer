@@ -45,11 +45,15 @@ If you don’t see changes in the browser UI:
 - Run tests (Pest/PHPUnit):
   ```bash
   docker compose exec app php artisan test
+  # or using Composer helper that runs tests inside Docker
+  composer run test:docker
   ```
 
 - Format code (Pint):
   ```bash
   docker compose exec app vendor/bin/pint --dirty
+  # or using Composer helper
+  composer run pint:docker
   ```
 
 - Install JS packages or build for production:
@@ -110,11 +114,13 @@ docker compose exec app php artisan config:clear
 
 The `vite.config.js` contains:
 ```js
-server: {
-  host: '0.0.0.0',
-  port: 5173,
-  strictPort: true,
-  cors: true,
+export default {
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true,
+    cors: true,
+  },
 }
 ```
 This allows Vite to listen inside the container and be available from the host at `http://localhost:5173`.
@@ -132,6 +138,24 @@ This allows Vite to listen inside the container and be available from the host a
 - Permission errors for `storage` or `bootstrap/cache`:
   - Run: `docker compose exec app php artisan storage:link`
   - Fix permissions on the host, e.g.: `chmod -R u+rw storage bootstrap/cache`
+
+- PHP on host fails with ICU library error when running tests (macOS/Homebrew):
+  - Symptom when running `php artisan test` on the host:
+    ```
+    dyld: Library not loaded: /opt/homebrew/opt/icu4c@76/lib/libicuuc.76.dylib
+    ```
+  - Recommended: run tests and Pint inside Docker instead of host PHP:
+    ```bash
+    docker compose up -d
+    composer run test:docker
+    composer run pint:docker
+    ```
+  - Alternatively, fix host PHP by installing the matching ICU and relinking PHP (advanced):
+    ```bash
+    brew install icu4c@76
+    brew unlink php && brew link php --force --overwrite
+    ```
+    Using Docker avoids host PHP/ICU compatibility issues.
 
 ## Stopping and cleaning up
 

@@ -57,6 +57,13 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
+        "test:docker": [
+            "docker compose exec app php artisan config:clear --ansi",
+            "docker compose exec app php artisan test"
+        ],
+        "pint:docker": [
+            "docker compose exec app vendor/bin/pint --dirty"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
