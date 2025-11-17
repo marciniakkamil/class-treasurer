@@ -4,6 +4,7 @@ namespace App\Livewire\Collections;
 
 use App\Filters\CollectionFilters;
 use App\Models\Collection;
+use App\Services\CollectionReadService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -37,7 +38,7 @@ class ListCollections extends Component
 
     public string $pendingDeleteName = '';
 
-    protected $queryString = [
+    protected array $queryString = [
         'filters' => [
             'except' => [
                 'name' => '',
@@ -54,7 +55,7 @@ class ListCollections extends Component
             'name' => request()->query('name'),
             'school_year' => request()->query('school_year'),
             'is_active' => request()->query('is_active'),
-        ], static fn ($v) => $v !== null);
+        ], static fn($v) => $v !== null);
 
         if ($legacy !== []) {
             $this->filters = array_merge($this->filters, $legacy);
@@ -93,29 +94,16 @@ class ListCollections extends Component
     /**
      * @throws AuthorizationException
      */
-    public function render(): View
+    public function render(CollectionReadService $collectionReadService): View
     {
         $this->authorize('viewAny', Collection::class);
+
         /* @var \App\Models\User $user */
         $user = auth()->user();
 
-        $this->schoolYearOptions = Collection::query() // todo move queries to Service or Repository
-            ->visibleTo($user)
-            ->select('school_year')
-            ->whereNotNull('school_year')
-            ->distinct()
-            ->orderByDesc('school_year')
-            ->pluck('school_year')
-            ->filter()
-            ->values()
-            ->all();
+        $this->schoolYearOptions = $collectionReadService->scholYearsOptions($user);
 
-        $collections = Collection::query()
-            ->visibleTo($user)
-            ->applyFilters(CollectionFilters::fromArray($this->filters))
-            ->withDashboardAggregates()
-            ->orderByDesc('created_at')
-            ->paginate(15);
+        $collections = $collectionReadService->paginateForList($user, CollectionFilters::fromArray($this->filters));
 
         return view('livewire.collections.list-collections', compact('collections'));
     }
