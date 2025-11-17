@@ -40,16 +40,14 @@ class CreateCollection extends Component
         /* @var \App\Models\User $user */
         $user = auth()->user();
 
-        $collection = null;
-
-        DB::transaction(function () use ($user, $validated) {
-            $collection = Collection::query()->create([
+        $collection = DB::transaction(function () use ($user, $validated) {
+            return Collection::query()->create([
                 'user_id' => $user->id,
                 'name' => $validated['name'],
                 'school_year' => $validated['school_year'] ?? null,
                 'description' => $validated['description'] ?? null,
                 'status' => 'active',
-                'is_active' => (bool)($validated['is_active'] ?? false),
+                'is_active' => (bool) ($validated['is_active'] ?? false),
             ]);
         });
 
