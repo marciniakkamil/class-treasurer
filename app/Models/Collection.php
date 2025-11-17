@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method CollectionBuilder newModelQuery()
  * @mixin CollectionBuilder
  */
+
+// todo change Collection name to Campaign
 class Collection extends Model
 {
     use HasFactory;
