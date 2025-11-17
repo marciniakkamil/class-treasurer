@@ -66,6 +66,13 @@
                         </td>
                         <td class="p-2">
                             <div class="flex items-center justify-center gap-3">
+                                @can('update', $collection)
+                                    <a href="{{ route('collections.edit', $collection) }}" class="inline-flex items-center cursor-pointer" title="Edytuj">
+                                        <flux:icon name="pencil-square" class="size-5 text-blue-600" />
+                                        <span class="sr-only">Edytuj</span>
+                                    </a>
+                                @endcan
+
                                 @can('delete', $collection)
                                     <button type="button" class="inline-flex items-center cursor-pointer" title="Usuń"
                                             wire:click="confirmDelete({{ $collection->id }}, @js($collection->name))">

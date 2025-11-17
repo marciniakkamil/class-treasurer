@@ -3,6 +3,7 @@
 use App\Http\Controllers\Collections\DeleteCollectionController;
 use App\Livewire\Collections\CreateCollection;
 use App\Livewire\Collections\ListCollections;
+use App\Livewire\Collections\EditCollection;
 use App\Livewire\Collections\ShowCollection;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -43,6 +44,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/collections/{collection}', ShowCollection::class)
         ->name('collections.show');
 
+    Route::get('/collections/{collection}/edit', EditCollection::class)
+        ->name('collections.edit');
+
     Route::delete('/collections/{collection}', DeleteCollectionController::class)
         ->name('collections.delete');
+
 });
