@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\Collections\CreateCollectionAction;
 use App\Filters\CollectionFilters;
 use App\Http\Requests\Api\V1\StoreCollectionRequest;
 use App\Http\Requests\Api\V1\UpdateCollectionRequest;
@@ -64,7 +65,7 @@ class CollectionController extends BaseController
     /**
      * POST /api/v1/collections
      */
-    public function store(StoreCollectionRequest $request): JsonResponse
+    public function store(StoreCollectionRequest $request, CreateCollectionAction $action): JsonResponse
     {
         $this->authorize('create', Collection::class);
 
@@ -72,16 +73,7 @@ class CollectionController extends BaseController
         $user = $request->user();
         $data = $request->validated();
 
-        $collection = DB::transaction(function () use ($user, $data) {
-            return Collection::query()->create([
-                'user_id' => $user->id,
-                'name' => $data['name'],
-                'school_year' => $data['school_year'] ?? null,
-                'description' => $data['description'] ?? null,
-                'status' => $data['status'] ?? 'active',
-                'is_active' => (bool) ($data['is_active'] ?? false),
-            ]);
-        });
+        $collection = $action->execute($user, $data);
 
         return (new CollectionResource($collection))
             ->response()
