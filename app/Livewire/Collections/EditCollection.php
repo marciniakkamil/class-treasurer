@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Livewire\Collections;
 
+use App\Actions\Collections\UpdateCollectionAction;
 use App\Models\Collection;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -29,12 +29,8 @@ class EditCollection extends Component
     #[Validate('boolean')]
     public bool $is_active = true;
 
-    public function mount(Collection|int|string $collection): void
+    public function mount(Collection $collection): void
     {
-        if (! $collection instanceof Collection) {
-            $collection = Collection::query()->findOrFail($collection);
-        }
-
         $this->authorize('update', $collection);
 
         $this->collectionModel = $collection;
@@ -45,20 +41,13 @@ class EditCollection extends Component
         $this->is_active = (bool) $collection->is_active;
     }
 
-    public function update(): mixed
+    public function update(UpdateCollectionAction $action): mixed
     {
         $this->authorize('update', $this->collectionModel);
 
         $validated = $this->validate();
 
-        DB::transaction(function () use ($validated): void {
-            $this->collectionModel->fill([
-                'name' => $validated['name'],
-                'school_year' => ($validated['school_year'] ?? '') !== '' ? $validated['school_year'] : null,
-                'description' => ($validated['description'] ?? '') !== '' ? $validated['description'] : null,
-                'is_active' => (bool) ($validated['is_active'] ?? false),
-            ])->save();
-        });
+        $action->execute($this->collectionModel, $validated);
 
         session()->flash('success', 'Zbiórka została zaktualizowana.');
 
