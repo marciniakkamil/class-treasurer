@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\Collections\CreateCollectionAction;
+use App\Actions\Collections\UpdateCollectionAction;
 use App\Filters\CollectionFilters;
 use App\Http\Requests\Api\V1\StoreCollectionRequest;
 use App\Http\Requests\Api\V1\UpdateCollectionRequest;
@@ -83,7 +84,7 @@ class CollectionController extends BaseController
     /**
      * PUT/PATCH /api/v1/collections/{collection}
      */
-    public function update(UpdateCollectionRequest $request, Collection $collection): CollectionResource
+    public function update(UpdateCollectionRequest $request, Collection $collection, UpdateCollectionAction $action): CollectionResource
     {
         $user = $request->user();
         if (! $user->isAdmin() && $user->id !== $collection->user_id) {
@@ -91,10 +92,7 @@ class CollectionController extends BaseController
         }
         $data = $request->validated();
 
-        DB::transaction(function () use ($data, $collection) {
-            $collection->fill($data);
-            $collection->save();
-        });
+        $action->execute($collection, $data);
 
         return new CollectionResource($collection);
     }
