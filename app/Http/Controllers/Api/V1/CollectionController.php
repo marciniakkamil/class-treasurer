@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\Collections\CreateCollectionAction;
+use App\Actions\Collections\DeleteCollectionAction;
 use App\Actions\Collections\UpdateCollectionAction;
 use App\Filters\CollectionFilters;
 use App\Http\Requests\Api\V1\StoreCollectionRequest;
@@ -17,7 +18,6 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\DB;
 
 class CollectionController extends BaseController
 {
@@ -100,16 +100,14 @@ class CollectionController extends BaseController
     /**
      * DELETE /api/v1/collections/{collection}
      */
-    public function destroy(Request $request, Collection $collection): JsonResponse
+    public function destroy(Request $request, Collection $collection, DeleteCollectionAction $action): JsonResponse
     {
         $user = $request->user();
         if (! $user->isAdmin() && $user->id !== $collection->user_id) {
             abort(403);
         }
 
-        DB::transaction(function () use ($collection) {
-            $collection->delete();
-        });
+        $action->execute($collection);
 
         return response()->json(null, 204);
     }
