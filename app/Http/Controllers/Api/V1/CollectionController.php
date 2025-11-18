@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\Collections\CreateCollectionAction;
+use App\Actions\Collections\DeleteCollectionAction;
+use App\Actions\Collections\UpdateCollectionAction;
 use App\Filters\CollectionFilters;
 use App\Http\Requests\Api\V1\StoreCollectionRequest;
 use App\Http\Requests\Api\V1\UpdateCollectionRequest;
@@ -15,7 +18,6 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\DB;
 
 class CollectionController extends BaseController
 {
@@ -64,7 +66,7 @@ class CollectionController extends BaseController
     /**
      * POST /api/v1/collections
      */
-    public function store(StoreCollectionRequest $request): JsonResponse
+    public function store(StoreCollectionRequest $request, CreateCollectionAction $action): JsonResponse
     {
         $this->authorize('create', Collection::class);
 
@@ -72,16 +74,7 @@ class CollectionController extends BaseController
         $user = $request->user();
         $data = $request->validated();
 
-        $collection = DB::transaction(function () use ($user, $data) {
-            return Collection::query()->create([
-                'user_id' => $user->id,
-                'name' => $data['name'],
-                'school_year' => $data['school_year'] ?? null,
-                'description' => $data['description'] ?? null,
-                'status' => $data['status'] ?? 'active',
-                'is_active' => (bool) ($data['is_active'] ?? false),
-            ]);
-        });
+        $collection = $action->execute($user, $data);
 
         return (new CollectionResource($collection))
             ->response()
@@ -91,7 +84,7 @@ class CollectionController extends BaseController
     /**
      * PUT/PATCH /api/v1/collections/{collection}
      */
-    public function update(UpdateCollectionRequest $request, Collection $collection): CollectionResource
+    public function update(UpdateCollectionRequest $request, Collection $collection, UpdateCollectionAction $action): CollectionResource
     {
         $user = $request->user();
         if (! $user->isAdmin() && $user->id !== $collection->user_id) {
@@ -99,10 +92,7 @@ class CollectionController extends BaseController
         }
         $data = $request->validated();
 
-        DB::transaction(function () use ($data, $collection) {
-            $collection->fill($data);
-            $collection->save();
-        });
+        $action->execute($collection, $data);
 
         return new CollectionResource($collection);
     }
@@ -110,16 +100,14 @@ class CollectionController extends BaseController
     /**
      * DELETE /api/v1/collections/{collection}
      */
-    public function destroy(Request $request, Collection $collection): JsonResponse
+    public function destroy(Request $request, Collection $collection, DeleteCollectionAction $action): JsonResponse
     {
         $user = $request->user();
         if (! $user->isAdmin() && $user->id !== $collection->user_id) {
             abort(403);
         }
 
-        DB::transaction(function () use ($collection) {
-            $collection->delete();
-        });
+        $action->execute($collection);
 
         return response()->json(null, 204);
     }
