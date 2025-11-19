@@ -1,4 +1,36 @@
-# Class Treasurer — Development with Docker Compose
+# Class Treasurer — School Fundraising App
+
+Class Treasurer is a modern web app that helps manage classroom and school fundraisers (field trips, textbooks, class fees, etc.). It streamlines day-to-day work for the class treasurer and gives a clear view of balances and transactions.
+
+Key features:
+- Fundraisers management: list view with filters (name, school year, status), pagination and sorting.
+- Fundraiser details: counters for guardians, payments, expenses, plus totals and balance.
+- Create, edit and delete fundraisers (with a confirmation modal).
+- Authorization with roles: Admin and Collector (fundraiser owner) backed by Laravel policies.
+- Versioned API v1 secured with Laravel Sanctum (Bearer tokens): full CRUD, filtering, sorting, pagination, and optional aggregates.
+- Comprehensive tests (Pest) for the web UI (Livewire) and API.
+
+Tech stack:
+- PHP 8.4, Laravel 12, Fortify (auth), Sanctum (API tokens)
+- Livewire v3 + Volt v1, Flux UI components, Tailwind CSS v4
+- Pest v4 (tests), Laravel Pint (code style)
+
+If you don’t see changes in the browser after editing frontend files, run `npm run dev` (Node container) or `composer run dev`.
+
+## API quick start
+
+Authentication: add `Authorization: Bearer <TOKEN>` header (Sanctum personal access token). Main endpoints:
+- GET `/api/v1/collections` — list with filters `filters[name|school_year|is_active]`, sorting `sort=-created_at,name`, and pagination `per_page`.
+- GET `/api/v1/collections/{id}` — details; add `include[]=aggregates` to include counters and sums.
+- POST `/api/v1/collections` — create a fundraiser.
+- PUT/PATCH `/api/v1/collections/{id}` — update.
+- DELETE `/api/v1/collections/{id}` — soft-delete.
+
+Example header: `Authorization: Bearer eyJ0eXAiOiJKV1Qi...`
+
+---
+
+## Development with Docker Compose
 
 This project is prepared to run locally in Docker containers with a ready-to-use setup for PHP (Artisan) and Node (Vite/Tailwind). This way you don’t need to install matching PHP/Node versions on your host.
 
@@ -32,8 +64,8 @@ If you don’t see changes in the browser UI:
 - Hard refresh the page to clear cache.
 
 4. Visit the app in your browser: http://localhost:8000
-5. If you want to run the demo data seeder: `php artisan db:seed --class=DemoDataSeeder`
-6. Admin login credentials after running demoDataSeeder: `email: admin@example.com` `password: password`
+5. Optional: seed demo data `php artisan db:seed --class=DemoDataSeeder`
+6. Demo admin credentials after seeding: `email: admin@example.com` `password: password`
 
 ## Useful commands
 
