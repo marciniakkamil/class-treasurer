@@ -1,39 +1,73 @@
 <div class="p-6 bg-white shadow-md rounded-2xl">
     <h1 class="text-2xl font-semibold mb-4">Zbiórki</h1>
 
-    <!-- Filtry todo przerobic na komponent -->
-    <div class="mb-4 grid gap-3 md:grid-cols-4">
-        <div>
-            <flux:field label="Nazwa">
-                <flux:input
-                    wire:model.live.debounce.300ms="filters.name"
-                    placeholder="Szukaj po nazwie..."
-                />
-            </flux:field>
+    <!-- Filtry todo przerobic na komponenty -->
+    <div class="mb-4">
+        <div class="grid gap-3 md:grid-cols-4">
+            <div>
+                <flux:field label="Nazwa">
+                    <flux:input
+                        wire:model.live.debounce.300ms="filters.name"
+                        placeholder="Szukaj po nazwie..."
+                    />
+                </flux:field>
+            </div>
+            <div>
+                <flux:field label="Rok szkolny">
+                    <flux:select wire:model.live="filters.school_year">
+                        <option value="">Wszystkie</option>
+                        @foreach($this->schoolYearOptions as $year)
+                            <option value="{{ $year }}">{{ $year }}</option>
+                        @endforeach
+                    </flux:select>
+                </flux:field>
+            </div>
+            <div>
+                <flux:field label="Status">
+                    <flux:select wire:model.live="filters.is_active">
+                        <option value="">Wszystkie</option>
+                        <option value="1">Aktywne</option>
+                        <option value="0">Nieaktywne</option>
+                    </flux:select>
+                </flux:field>
+            </div>
+            <div class="flex items-end">
+                <flux:button wire:click="clearFilters" variant="outline" class="w-full" wire:loading.attr="disabled">
+                    Wyczyść filtry
+                </flux:button>
+            </div>
         </div>
-        <div>
-            <flux:field label="Rok szkolny">
-                <flux:select wire:model.live="filters.school_year">
-                    <option value="">Wszystkie</option>
-                    @foreach($this->schoolYearOptions as $year)
-                        <option value="{{ $year }}">{{ $year }}</option>
-                    @endforeach
+    </div>
+
+    <!-- Sortowanie i stronicowanie -->
+    <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-end">
+        <div class="md:w-64">
+            <div class="md:w-24 mb-2">
+                <flux:heading>Sortuj wg:</flux:heading>
+            </div>
+            <flux:field label="Sortuj wg">
+                <flux:select wire:model.live="sort">
+                    <option value="-created_at">Najnowsze</option>
+                    <option value="created_at">Najstarsze</option>
+                    <option value="name">Nazwa A→Z</option>
+                    <option value="-name">Nazwa Z→A</option>
+                    <option value="school_year">Rok szkolny rosnąco</option>
+                    <option value="-school_year">Rok szkolny malejąco</option>
                 </flux:select>
             </flux:field>
         </div>
-        <div>
-            <flux:field label="Status">
-                <flux:select wire:model.live="filters.is_active">
-                    <option value="">Wszystkie</option>
-                    <option value="1">Aktywne</option>
-                    <option value="0">Nieaktywne</option>
+        <div class="md:w-48">
+            <div class="md:w-24 mb-2">
+                <flux:heading>Na stronę:</flux:heading>
+            </div>
+            <flux:field label="Na stronę">
+                <flux:select wire:model.live="perPage">
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
                 </flux:select>
             </flux:field>
-        </div>
-        <div class="flex items-end">
-            <flux:button wire:click="clearFilters" variant="outline" class="w-full" wire:loading.attr="disabled">
-                Wyczyść filtry
-            </flux:button>
         </div>
     </div>
 

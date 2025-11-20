@@ -29,6 +29,10 @@ class ListCollections extends Component
 
     public array $schoolYearOptions = [];
 
+    public string $sort = '-created_at';
+
+    public int $perPage = 15;
+
     /**
      * Sterowanie modalem potwierdzenia usunięcia.
      */
@@ -46,6 +50,8 @@ class ListCollections extends Component
                 'is_active' => '',
             ],
         ],
+        'sort' => ['except' => '-created_at'],
+        'perPage' => ['except' => 15],
     ];
 
     public function mount(): void
@@ -55,7 +61,7 @@ class ListCollections extends Component
             'name' => request()->query('name'),
             'school_year' => request()->query('school_year'),
             'is_active' => request()->query('is_active'),
-        ], static fn($v) => $v !== null);
+        ], static fn ($v) => $v !== null);
 
         if ($legacy !== []) {
             $this->filters = array_merge($this->filters, $legacy);
@@ -63,6 +69,16 @@ class ListCollections extends Component
     }
 
     public function updatedFilters(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSort(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage(): void
     {
         $this->resetPage();
     }
@@ -103,7 +119,12 @@ class ListCollections extends Component
 
         $this->schoolYearOptions = $collectionReadService->scholYearsOptions($user);
 
-        $collections = $collectionReadService->paginateForList($user, CollectionFilters::fromArray($this->filters));
+        $collections = $collectionReadService->paginateForList(
+            $user,
+            CollectionFilters::fromArray($this->filters),
+            $this->perPage,
+            $this->sort,
+        );
 
         return view('livewire.collections.list-collections', compact('collections'));
     }
