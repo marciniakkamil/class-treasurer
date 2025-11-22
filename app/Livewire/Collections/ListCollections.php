@@ -17,7 +17,7 @@ class ListCollections extends Component
     use WithPagination;
 
     /**
-     * Zbiorcze filtry przekazywane również w query string jako filters[...].
+     * Aggregate filters also passed in the query string as filters[...].
      *
      * @var array{name: string, school_year: string, is_active: string}
      */
@@ -34,7 +34,7 @@ class ListCollections extends Component
     public int $perPage = 15;
 
     /**
-     * Sterowanie modalem potwierdzenia usunięcia.
+     * Deletion confirmation modal state.
      */
     public bool $showDeleteModal = false;
 
@@ -56,7 +56,7 @@ class ListCollections extends Component
 
     public function mount(): void
     {
-        // Kompatybilność ze starszymi URL: ?name=&school_year=&is_active=
+        // Backwards compatibility with older URLs: ?name=&school_year=&is_active=
         $legacy = array_filter([
             'name' => request()->query('name'),
             'school_year' => request()->query('school_year'),
