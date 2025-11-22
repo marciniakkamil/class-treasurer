@@ -59,9 +59,9 @@ it('nullifies optional fields on empty strings and casts boolean', function () {
 
     $data = [
         'name' => 'Zmieniona',
-        'school_year' => '', // powinno stać się null
-        'description' => '', // powinno stać się null
-        'is_active' => true, // powinno pozostać true
+        'school_year' => '', // should become null
+        'description' => '', // should become null
+        'is_active' => true, // should remain true
     ];
 
     $action = new UpdateCollectionAction;

@@ -1,7 +1,7 @@
 <div class="p-6 bg-white shadow-md rounded-2xl">
     <h1 class="text-2xl font-semibold mb-4">Zbiórki</h1>
 
-    <!-- Filtry todo przerobic na komponenty -->
+    <!-- Filters (todo: refactor into components) -->
     <div class="mb-4">
         <div class="grid gap-3 md:grid-cols-4">
             <div>
@@ -24,7 +24,7 @@
             </div>
             <div>
                 <flux:field label="Status">
-                    <flux:select wire:model.live="filters.is_active">
+                    <flux:select id="status-filter" wire:model.live="filters.is_active" data-testid="status-filter">
                         <option value="">Wszystkie</option>
                         <option value="1">Aktywne</option>
                         <option value="0">Nieaktywne</option>
@@ -39,7 +39,7 @@
         </div>
     </div>
 
-    <!-- Sortowanie i stronicowanie -->
+    <!-- Sorting and pagination -->
     <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-end">
         <div class="md:w-64">
             <div class="md:w-24 mb-2">
@@ -116,6 +116,7 @@
                                 @endcan
 
                                 <a href="{{ route('collections.show', $collection) }}"
+                                   data-testid="collection-details-{{ $collection->id }}"
                                    class="text-blue-600 hover:underline font-medium rounded-md inline-flex items-center gap-1">
                                     <span>Szczegóły</span>
                                 </a>
@@ -127,7 +128,7 @@
             </table>
         </div>
 
-        <!-- Paginacja -->
+        <!-- Pagination -->
         <div class="mt-4">
             {{ $collections->links() }}
         </div>
