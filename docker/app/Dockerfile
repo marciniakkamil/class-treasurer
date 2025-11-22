@@ -18,6 +18,7 @@ RUN set -eux; \
     docker-php-ext-configure pcntl --enable-pcntl; \
     docker-php-ext-install -j$(nproc) \
         pcntl \
+        sockets \
         pdo \
         pdo_sqlite \
         pdo_mysql \
