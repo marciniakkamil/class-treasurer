@@ -10,6 +10,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class CollectionReadService
 {
+    /**
+     * Returns available school years for the given user.
+     */
     public function scholYearsOptions(User $user): array
     {
         return Collection::query()
@@ -41,6 +44,21 @@ class CollectionReadService
         $this->applySorting($query, $sort);
 
         return $query->paginate($perPage);
+    }
+
+    /**
+     * Provide a base query builder for CSV export (no pagination) with safe sorting.
+     */
+    public function queryForExport(User $user, CollectionFilters $filters, string $sort = '-created_at'): CollectionBuilder
+    {
+        /** @var CollectionBuilder $query */
+        $query = Collection::query()
+            ->visibleTo($user)
+            ->applyFilters($filters);
+
+        $this->applySorting($query, $sort);
+
+        return $query->select(['id', 'name', 'school_year', 'is_active', 'created_at']);
     }
 
     /**
