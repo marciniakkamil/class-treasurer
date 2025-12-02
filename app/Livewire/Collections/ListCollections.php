@@ -100,7 +100,7 @@ class ListCollections extends Component
             sort: $this->sort,
         ));
 
-        session()->flash('status', 'Eksport CSV został rozpoczęty. Powiadomimy Cię po zakończeniu.');
+        session()->flash('export-status', 'Eksport CSV został rozpoczęty. Powiadomimy Cię po zakończeniu.');
     }
 
     public function confirmDelete(int $collectionId, string $collectionName): void
