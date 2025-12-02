@@ -40,7 +40,17 @@
     </div>
 
     <!-- Sorting and pagination -->
-    <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-end">
+    <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+            @if (session('status'))
+                <div class="mb-2 text-green-700">
+                    {{ session('status') }}
+                </div>
+            @endif
+            <flux:button wire:click="exportCsv" variant="primary" wire:loading.attr="disabled">
+                Eksportuj CSV
+            </flux:button>
+        </div>
         <div class="md:w-64">
             <div class="md:w-24 mb-2">
                 <flux:heading>Sortuj wg:</flux:heading>
