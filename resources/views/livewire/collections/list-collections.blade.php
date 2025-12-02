@@ -42,9 +42,9 @@
     <!-- Sorting and pagination -->
     <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-            @if (session('status'))
+            @if (session('export-status'))
                 <div class="mb-2 text-green-700">
-                    {{ session('status') }}
+                    {{ session('export-status') }}
                 </div>
             @endif
             <flux:button wire:click="exportCsv" variant="primary" wire:loading.attr="disabled">
