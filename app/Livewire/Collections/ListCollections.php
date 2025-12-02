@@ -3,6 +3,7 @@
 namespace App\Livewire\Collections;
 
 use App\Filters\CollectionFilters;
+use App\Jobs\ExportCollectionsCsv;
 use App\Models\Collection;
 use App\Services\CollectionReadService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -81,6 +82,25 @@ class ListCollections extends Component
     public function updatedPerPage(): void
     {
         $this->resetPage();
+    }
+
+    /**
+     * Dispatch the CSV export job to the queue.
+     */
+    public function exportCsv(): void
+    {
+        $this->authorize('viewAny', Collection::class);
+
+        /* @var \App\Models\User $user */
+        $user = auth()->user();
+
+        dispatch(new ExportCollectionsCsv(
+            userId: $user->id,
+            filters: $this->filters,
+            sort: $this->sort,
+        ));
+
+        session()->flash('status', 'Eksport CSV został rozpoczęty. Powiadomimy Cię po zakończeniu.');
     }
 
     public function confirmDelete(int $collectionId, string $collectionName): void
