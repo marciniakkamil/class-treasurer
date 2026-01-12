@@ -1,5 +1,24 @@
 <div class="p-6 bg-white shadow-md rounded-2xl">
-    <h1 class="text-2xl font-semibold mb-4">Zbiórki</h1>
+
+    <!-- todo: move to layout / create notifications icon -->
+    <div class="space-y-4">
+        @foreach(auth()->user()->unreadNotifications->take(1) as $notification)
+            <div x-data="{ open: true }" x-show="open"
+                 class="flex items-center justify-between p-4 bg-white shadow rounded-lg border border-gray-200 transition duration-300"
+                 x-transition.opacity>
+                <div>
+                    <p class="text-gray-800 font-medium">{{ $notification->data['message'] }}</p>
+                </div>
+                <a href="{{ $notification->data['url'] }}"
+                   @click="open = false; $wire.markNotificationAsRead('{{ $notification->id }}')"
+                   class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-semibold rounded hover:bg-blue-700 transition">
+                    Pobierz CSV
+                </a>
+            </div>
+        @endforeach
+    </div>
+
+    <h1 class="text-2xl font-semibold mb-4 mt-4">Zbiórki</h1>
 
     <!-- Filters (todo: refactor into components) -->
     <div class="mb-4">

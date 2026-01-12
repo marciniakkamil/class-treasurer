@@ -8,6 +8,7 @@ use App\Livewire\Collections\ShowCollection;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
+use \Illuminate\Support\Facades\Storage;
 
 Route::get('/', function () {
     return view('welcome');
@@ -49,5 +50,13 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/collections/{collection}', DeleteCollectionController::class)
         ->name('collections.delete');
+
+    Route::get('/exports/{userId}/{filename}', function ($userId, $filename) {
+        $path = "exports/{$userId}/{$filename}";
+        if (!Storage::disk('local')->exists($path)) {
+            abort(404);
+        }
+        return Storage::disk('local')->download($path);
+    })->name('exports.download');
 
 });
