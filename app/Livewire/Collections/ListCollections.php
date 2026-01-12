@@ -148,4 +148,16 @@ class ListCollections extends Component
 
         return view('livewire.collections.list-collections', compact('collections'));
     }
+
+    /**
+     * @param $notificationId
+     * @return void
+     */
+    public function markNotificationAsRead($notificationId): void
+    {
+        $notification = auth()->user()->notifications()->find($notificationId);
+        if ($notification) {
+            $notification->markAsRead();
+        }
+    }
 }
