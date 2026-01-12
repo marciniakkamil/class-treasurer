@@ -22,9 +22,13 @@ class CollectionsExportReady extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
+    /**
+     * @param object $notifiable
+     * @return MailMessage
+     */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
@@ -35,5 +39,19 @@ class CollectionsExportReady extends Notification implements ShouldQueue
             ->line('Ścieżka (storage/app): '.$this->path)
             ->line('Możesz pobrać plik bezpośrednio ze storage lub przygotować publiczny link, jeśli to wymagane.')
             ->salutation('— Class Treasurer');
+    }
+
+    /**
+     * @param object $notifiable
+     * @return array
+     */
+    public function toDatabase(object $notifiable): array
+    {
+        $url = route('exports.download', ['userId' => $notifiable->id, 'filename' => $this->filename]);
+        return [
+            'url' => $url,
+            'message' => 'Twój export jest gotowy',
+            'filename' => $this->filename,
+        ];
     }
 }
